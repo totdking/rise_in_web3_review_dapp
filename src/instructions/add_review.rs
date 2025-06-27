@@ -8,7 +8,6 @@ use solana_program::{
     system_instruction,
     sysvar::{rent::Rent, Sysvar},
 };
-use solana_sdk::system_program;
 
 use crate::state::{AccountState, ReviewError};
 use borsh::{BorshDeserialize, BorshSerialize};
@@ -32,13 +31,15 @@ pub fn add_review(
     let pda_account = next_account_info(accounts_info_iter)?;
     let system_program = next_account_info(accounts_info_iter)?;
 
+    let system_program_hardcoded = Pubkey::from_str_const("11111111111111111111111111111111");
+
     if !initializer.is_signer {
         msg!("\nSigner check passed");
         return Err(ProgramError::MissingRequiredSignature);
     }
 
     // Added this check to be sure that only the given solana program is the needed owner
-    if *system_program.key != system_program::ID {
+    if *system_program.key != system_program_hardcoded {
         return Err(ProgramError::IllegalOwner);
     }
 
